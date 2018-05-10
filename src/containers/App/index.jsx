@@ -1,5 +1,5 @@
 import React from 'react'
-import Titles from '../../components/Titles'
+import Titles from 'components/Titles'
 import './index.scss'
 
 class App extends React.Component {
