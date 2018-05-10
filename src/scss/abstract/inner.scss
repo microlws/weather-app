@@ -1,0 +1,8 @@
+@import "scss/variable/metrics";
+
+@mixin inner {
+  background-color: #FFFFFF;
+  margin: 0 auto;
+  max-width: $max-width;
+  padding: 0 $spacing;
+}

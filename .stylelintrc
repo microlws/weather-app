@@ -1,0 +1,12 @@
+{
+  "extends": "stylelint-config-suitcss",
+  "plugins": [
+    "stylelint-scss",
+    "stylelint-suitcss",
+    "stylelint-order"
+  ],
+  "rules": {
+    "color-hex-case": "upper",
+    "color-hex-length": "long"
+  }
+}

@@ -1,2 +1,1 @@
-# React Boilerplate
 "# weather-app" 

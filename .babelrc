@@ -1,0 +1,56 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "browsers": [
+            "last 2 versions",
+            "not IE <= 10",
+            "> 5%"
+          ]
+        },
+        "debug": false,
+        "loose": true,
+        "modules": false,
+        "useBuiltIns": true
+      }
+    ],
+    "react"
+  ],
+  "plugins": [
+    [
+      "module-alias",
+      [
+        {
+          "src": "./src/components",
+          "expose": "components"
+        },
+        {
+          "src": "./src/containers",
+          "expose": "containers"
+        }
+      ]
+    ],
+    [
+      "transform-object-rest-spread",
+      {
+        "useBuiltIns": true
+      }
+    ],
+    "transform-class-properties",
+    "syntax-dynamic-import"
+  ],
+  "env": {
+    "development": {
+      "plugins": [
+        "react-hot-loader/babel"
+      ]
+    },
+    "production": {
+      "presets": [
+        "react-optimize"
+      ]
+    }
+  }
+}
