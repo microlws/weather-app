@@ -1,11 +1,14 @@
 import React from 'react';
-
+import Titles from './components/titles/Titles.jsx';
 import './index.scss';
 
-const App = () => (
-  <div className='App'>
-    add new components or HTML here
-  </div>
-);
-
+class App extends React.Component {
+  render() {
+    return (
+      <div className='App'>
+        <Titles />
+      </div>
+    );
+  }
+};
 export default App;
