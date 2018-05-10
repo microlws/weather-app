@@ -24,6 +24,7 @@
     "connected-react-router": "^4.3.0",
     "domready": "^1.0.8",
     "eslint-watch": "^3.1.2",
+    "fetch": "^1.1.0",
     "form-data": "^2.3.1",
     "form-serialize": "^0.7.2",
     "fs": "0.0.1-security",
