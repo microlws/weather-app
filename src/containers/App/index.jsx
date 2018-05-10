@@ -11,12 +11,12 @@ class App extends React.Component {
     const api_call = await fetch(`http://api.openweathermap.org/data/2.5/weather?q=Aarhus&APPID=${API_KEY}&units=metric`);
     const data = await api_call.json();
     console.log(data);
-  }
+  };
   render() {
     return (
       <div className='App'>
         <Titles />
-        <Form />
+        <Form getWeather={this.getWeather}/>
         <Weather />
       </div>
     );
