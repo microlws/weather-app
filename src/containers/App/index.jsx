@@ -1,14 +1,14 @@
-import React from 'react'
-import Titles from 'components/Titles'
-import './index.scss'
+import React from 'react';
+import Titles from 'components/Titles';
+import './index.scss';
 
 class App extends React.Component {
   render() {
     return (
-      <div className="App">
+      <div className='App'>
         <Titles />
       </div>
-    )
+    );
   }
-}
-export default App
+};
+export default App;

@@ -9,7 +9,7 @@ const CompressionPlugin = require('compression-webpack-plugin');
 const StyleLintPlugin = require('stylelint-webpack-plugin');
 const stylelintFormatter = require('stylelint-formatter-pretty');
 
-const title = 'Jakobs Website';
+const title = 'Weather App';
 
 // replace localhost with 0.0.0.0 if you want to access
 // your app from wifi or a virtual machine
