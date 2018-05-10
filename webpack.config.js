@@ -20,7 +20,9 @@ const buildPath = path.join(__dirname, './build');
 const nodePath = `${__dirname}/node_modules`;
 
 // Function to check if entry is vendor for bundling
-const isVendor = ({ resource }) => resource &&
+const isVendor = ({
+    resource
+  }) => resource &&
   resource.indexOf('node_modules') >= 0 &&
   resource.match(/\.js$/);
 
@@ -48,7 +50,9 @@ module.exports = function webpackExport(env) {
     // Setting production environment will strip out
     // some of the development code from the app and libraries
     new webpack.DefinePlugin({
-      'process.env': { NODE_ENV: JSON.stringify(nodeEnv) }
+      'process.env': {
+        NODE_ENV: JSON.stringify(nodeEnv)
+      }
     }),
 
     // Enable scope hoisting
@@ -191,7 +195,9 @@ module.exports = function webpackExport(env) {
         react: `${nodePath}/react`,
         'react-dom': `${nodePath}/react-dom`,
         'react-router-dom': `${nodePath}/react-router-dom`,
-        scss: `${sourcePath}/scss`
+        scss: `${sourcePath}/scss`,
+        components: `${sourcePath}/components`,
+        containers: `${sourcePath}/containers`
       },
     },
     entry: {
@@ -210,8 +216,7 @@ module.exports = function webpackExport(env) {
     },
     plugins,
     module: {
-      rules: [
-        {
+      rules: [{
           test: /\.[ot]tf$/,
           exclude: /node_modules/,
           use: {
