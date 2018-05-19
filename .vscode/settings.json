@@ -1,5 +1,11 @@
 {
   "git.ignoreLimitWarning": true,
   "editor.tabSize": 2,
-  "editor.fontFamily": "'Consolas', 'monospace', monospace, 'Droid Sans Fallback'"
+  "editor.fontFamily": "'Consolas', 'monospace', monospace, 'Droid Sans Fallback'",
+  "files.insertFinalNewline": true,
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/tmp": true
+  }
 }

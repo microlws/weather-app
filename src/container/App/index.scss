@@ -1,0 +1,20 @@
+.App {
+  width: 550px;
+  &__media {
+    height: 290px;
+  }
+  &__media-inner {
+    height: 100%;
+    position: relative;
+  }
+  &__media-overlay {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  &__field {
+    margin-bottom: 16px !important;
+  }
+}
