@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 
 // variables
-const isProduction = process.argv.indexOf('-p') >= 0
+const isProduction = process.env.NODE_ENV === 'production'
 const sourcePath = path.join(__dirname, './src')
 const outPath = path.join(__dirname, './dist')
 const nodePath = path.join(__dirname, './node_modules')
@@ -12,8 +12,27 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
 
+const basePlugins = [
+  new WebpackCleanupPlugin(),
+  new ExtractTextPlugin({
+    filename: 'styles.css',
+  }),
+  new HtmlWebpackPlugin({
+    title: 'WWII Online WebMap',
+    template: 'assets/index.html',
+    production: isProduction,
+  }),
+]
+
+const plugins = isProduction ? basePlugins.concat([]) : basePlugins.concat([
+  new webpack.HotModuleReplacementPlugin({
+    // Options...
+  })
+])
+
 module.exports = {
   context: sourcePath,
+  devtool: isProduction ? 'source-map' : 'eval',
   entry: {
     main: './main.jsx',
   },
@@ -27,14 +46,11 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.jsx', '.js', '.json'],
     alias: {
-      action: path.resolve('./src/action/'),
       component: path.resolve('./src/component/'),
       container: path.resolve('./src/container/'),
-      constant: path.resolve('./src/constant/'),
-      reducer: path.resolve('./src/reducer/'),
-      store: path.resolve('./src/store/'),
       tools: path.resolve('./src/tools/'),
-      image: path.resolve('./src/image/'),
+      assets: path.resolve('./src/assets/'),
+      scss: path.resolve('./src/scss/'),
     },
   },
   module: {
@@ -44,14 +60,7 @@ module.exports = {
         // Include js, jsx, and files.
         test: /\.(jsx?)|(js)$/,
         exclude: /node_modules/,
-        loader: 'babel-loader',
-        options: {
-          // This is a feature of `babel-loader` for Webpack (not Babel itself).
-          // It enables caching results in ./node_modules/.cache/babel-loader/
-          // directory for faster rebuilds.
-          cacheDirectory: true,
-          plugins: ['react-hot-loader/babel'],
-        },
+        loader: 'babel-loader'
       },
       // css
       {
@@ -166,24 +175,10 @@ module.exports = {
     },
     runtimeChunk: true,
   },
-  plugins: [
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      DEBUG: false,
-    }),
-    new WebpackCleanupPlugin(),
-    new ExtractTextPlugin({
-      filename: 'styles.css',
-    }),
-    new HtmlWebpackPlugin({
-      title: 'WWII Online WebMap',
-      template: 'assets/index.html',
-      production: isProduction,
-    }),
-  ],
+  plugins: plugins,
   devServer: {
     contentBase: sourcePath,
-    hot: true,
+    hot: !isProduction,
     inline: true,
     historyApiFallback: {
       disableDotRule: true,

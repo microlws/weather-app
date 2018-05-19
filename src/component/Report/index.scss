@@ -1,17 +1,17 @@
 .Report {
   &__icon {
     height: 96.7136px;
-    left: 0;
+    left: 10px;
     position: absolute;
-    top: 0;
+    top: 10px;
     width: 100px;
   }
   &__temperature {
     color: #FFFFFF;
     font-size: 45px;
     font-weight: 900;
+    left: 22px;
     position: absolute;
-    right: 8px;
     text-shadow: 2px 2px 4px rgba(88, 88, 88, 0.9);
     top: 11px;
   }
@@ -19,9 +19,18 @@
     color: #FFFFFF;
     font-size: 25px;
     font-weight: 900;
-    left: 8px;
+    left: 120px;
     position: absolute;
     text-shadow: 2px 2px 4px rgba(88, 88, 88, 0.9);
-    top: 11px;
+    top: 18px;
+  }
+  &__country {
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 700;
+    left: 120px;
+    position: absolute;
+    text-shadow: 2px 2px 4px rgba(88, 88, 88, .9);
+    top: 48px;
   }
 }

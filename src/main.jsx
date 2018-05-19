@@ -2,7 +2,6 @@ import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
 import domready from 'domready'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { AppContainer } from 'react-hot-loader'
 import App from './container/App'
 import './scss/main.scss'
 
@@ -26,11 +25,9 @@ const theme = createMuiTheme({
 const renderApp = Component => {
   domready(() => {
     ReactDOM.render(
-      <AppContainer>
-        <MuiThemeProvider theme={theme}>
-          <Component />
-        </MuiThemeProvider>
-      </AppContainer>,
+      <MuiThemeProvider theme={theme}>
+        <Component />
+      </MuiThemeProvider>,
       document.getElementById('root'),
     )
   })

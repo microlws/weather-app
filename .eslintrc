@@ -1,35 +1,39 @@
 {
-  "extends": ["eslint:recommended", "airbnb"],
+  "extends": ["airbnb", "prettier"],
   "globals": {
     "document": true,
     "window": true
   },
+  "plugins": ["babel"],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 8,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+      "arrowFunctions": true,
+      "classes": true,
+      "spread": true
+    }
+  },
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
   "rules": {
-    "jsx-a11y/href-no-hash": "off",
-    "jsx-a11y/anchor-is-valid": ["error", {
-      "components": ["Link"],
-      "specialLink": ["to"]
+    "react/jsx-max-props-per-line": [2, {
+      "maximum": 4,
+      "when": "always"
     }],
-    "jsx-a11y/click-events-have-key-events": "off",
-    "jsx-a11y/no-static-element-interactions": "off",
-    "jsx-quotes": [2, "prefer-double"],
-    "react/jsx-curly-spacing": [0, "always"],
-    "react/prefer-stateless-function": [0],
     "react/forbid-prop-types": ["any"],
-    "react/jsx-boolean-value": 0,
-    "function-paren-newline": ["warn", "multiline"],
-    "max-len": [1, {
-      "code": 120
-    }],
-    "import/prefer-default-export": "off",
-    "semi": "off",
-    "comma-dangle": "off",
-    "object-curly-newline": "off",
-    "arrow-parens": "off"
+    "import/prefer-default-export": "off"
   },
   "settings": {
     "import/resolver": {
-      "webpack": {}
+      "webpack": {
+        "config": "webpack.config.js"
+      }
     }
   }
 }
