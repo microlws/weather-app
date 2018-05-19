@@ -1,13 +1,10 @@
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
-import { Provider } from 'react-redux'
 import domready from 'domready'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { AppContainer } from 'react-hot-loader'
 import App from './container/App'
-import configureStore from './store/configureStore'
 import './scss/main.scss'
-
-const store = configureStore()
 
 const theme = createMuiTheme({
   palette: {
@@ -29,11 +26,11 @@ const theme = createMuiTheme({
 const renderApp = Component => {
   domready(() => {
     ReactDOM.render(
-      <Provider store={store}>
+      <AppContainer>
         <MuiThemeProvider theme={theme}>
-          <Component store={store} />
+          <Component />
         </MuiThemeProvider>
-      </Provider>,
+      </AppContainer>,
       document.getElementById('root'),
     )
   })

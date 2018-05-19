@@ -1,3 +1,0 @@
-export const WEATER_UPDATE = 'WEATHER_UPDATE'
-export const WEATER_RESET = 'WEATER_RESET'
-export const WEATER_DATA = 'WEATER_DATA'
