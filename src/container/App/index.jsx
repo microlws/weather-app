@@ -1,54 +1,36 @@
 import { Button, Card, CardActions, CardContent, CardMedia, TextField } from '@material-ui/core'
 import { Form, Formik, Field } from 'formik'
+import axios from 'axios'
 import React from 'react'
 import Map from 'component/Map'
 import Report from 'component/Report'
 import CountrySuggest from 'component/CountrySuggest'
 import MapStylePicker from 'component/MapStylePicker'
 import { fetchGeoLocation, fetchWeatherByCity, fetchWeatherByLocation } from 'tools/weather'
+import { getCountryNameFromCode } from 'tools/countries'
+import { smoothZoomIn, smoothZoomOut } from 'tools/googleZoom'
 import * as mapStyles from 'tools/mapStyles'
 import './index.scss'
 
-const smoothZoomIn = (map, max, cnt) => {
-  if (cnt >= max + 1) {
-    return false
-  }
-
-  const z = window.google.maps.event.addListener(map, 'zoom_changed', () => {
-    window.google.maps.event.removeListener(z)
-    smoothZoomIn(map, max, cnt + 1)
-  })
-  setTimeout(() => {
-    map.setZoom(cnt)
-  }, 80)
-
-  return true
-}
-
-const smoothZoomOut = (map, min, cnt) => {
-  if (cnt < min) {
-    return false
-  }
-
-  const z = window.google.maps.event.addListener(map, 'zoom_changed', () => {
-    window.google.maps.event.removeListener(z)
-    smoothZoomOut(map, min, cnt - 1)
-  })
-  setTimeout(() => {
-    map.setZoom(cnt)
-  }, 80)
-
-  return true
+const SETTINGS = {
+  MAX_ZOOM: 15,
+  MIN_ZOOM: 3,
+  CLOSEUP_ZOOM: 10,
+  DEFAULT_ZOOM: 6,
+  GOOGLE_KEY: 'AIzaSyAP70dQfEIvqOSQ7O8tXMEuErqQsa7V0wE',
+  GOOGLE_URL_GEOCODE: 'https://maps.googleapis.com/maps/api/geocode/json',
+  GOOGLE_URL_MAPS: 'https://maps.googleapis.com/maps/api/js',
+  DEFAULT_POSITION: {
+    lat: 51,
+    lng: 0,
+  },
 }
 
 const initialState = {
   notFound: false,
   loading: false,
   data: false,
-  coords: {
-    lat: 51,
-    lng: 0,
-  },
+  position: false,
 }
 
 class App extends React.Component {
@@ -57,107 +39,92 @@ class App extends React.Component {
   state = { ...initialState, mapStyleKey: 'flat' }
 
   componentWillMount() {
-    if (window.navigator && window.navigator.geolocation) {
-      this.initLocation()
-    } else {
-      this.initLocation(true)
-    }
+    this.initLocation(window.navigator && window.navigator.geolocation)
   }
 
   handleDrag = async () => {
     this.dragged = true
 
-    const center = window.gmap.getCenter()
+    const { mapToWeatherPos, updateWeather, mapPan } = this
+    const map = window.gmap
 
-    const coords = {
-      lat: center.lat(),
-      lon: center.lng(),
-    }
+    const z = google.maps.event.addListener(map, 'idle', async () => {
+      const center = window.gmap.getCenter()
 
-    const resp = await fetchWeatherByLocation(coords)
+      let position = {
+        lat: center.lat(),
+        lng: center.lng(),
+      }
 
-    this.updateWeather(resp, {
-      lat: center.lat(),
-      lng: center.lng(),
+      const weather = await fetchWeatherByLocation(mapToWeatherPos(position))
+
+      if (weather && weather.data && weather.data.name) {
+        const geolocation = await axios.get(
+          `${SETTINGS.GOOGLE_URL_GEOCODE}?key=${SETTINGS.GOOGLE_KEY}&address=${
+            weather.data.name
+          }+${getCountryNameFromCode(weather.data.sys.country)}`,
+        )
+        const geoData = geolocation.data
+
+        if (geoData && geoData.results && geoData.results.length) {
+          const result = geoData.results[0]
+          position = result.geometry.location
+        }
+      }
+
+      updateWeather(weather)
+      mapPan(position)
+
+      google.maps.event.removeListener(z)
     })
   }
 
   handleFormChange = async values => {
-    const resp = await fetchWeatherByCity(values)
+    const { weatherToMapPos, updateWeather, mapPan, mapZoom } = this
+    const response = await fetchWeatherByCity(values)
 
-    this.updateWeather(resp)
+    updateWeather(response)
+    mapPan(weatherToMapPos(response.data))
+    mapZoom(250)
   }
 
-  initLocation = async useDefaults => {
-    const { state } = this
+  initLocation = async useDefaultLocation => {
+    const { dragged, mapToWeatherPos, locationToWeatherPos, weatherToMapPos, updateWeather, mapPan } = this
 
-    if (!useDefaults) {
-      fetchGeoLocation(async position => {
-        const coords = position
-          ? { lat: position.coords.latitude, lon: position.coords.longitude }
-          : { lat: state.coords.lat, lon: state.coords.lng }
+    if (!useDefaultLocation) {
+      fetchGeoLocation(async geoLocation => {
+        const position = geoLocation ? locationToWeatherPos(geoLocation) : mapToWeatherPos(SETTINGS.DEFAULT_POSITION)
+        const response = await fetchWeatherByLocation(position)
 
-        const resp = await fetchWeatherByLocation(coords)
+        updateWeather(response)
 
-        if (!this.dragged) {
-          this.updateWeather(resp, false, true)
+        if (!dragged) {
+          mapPan(weatherToMapPos(position))
         }
       })
     } else {
-      const resp = await fetchWeatherByLocation({
-        lat: state.coords.lat,
-        lon: state.coords.lng,
-      })
+      const weatherPos = mapToWeatherPos(SETTINGS.DEFAULT_POSITION)
+      const response = await fetchWeatherByLocation(weatherPos)
 
-      if (!this.dragged) {
-        this.updateWeather(resp, false, true)
+      updateWeather(response)
+
+      if (!dragged) {
+        mapPan(weatherToMapPos(response.data))
       }
     }
   }
 
-  updateWeather = (resp, coords = false, initial = false) => {
-    if (!resp) {
-      this.setState({ ...initialState, notFound: true })
-    } else if (resp === 404) {
-      this.setState({ ...initialState, notFound: true })
-    } else if (!coords) {
-      this.dragged = true
-
+  updateWeather = response => {
+    if (response && response !== 404) {
       this.setState({
         ...initialState,
-        data: resp.data,
-        notFound: false,
+        data: response.data,
       })
-
-      const map = window.gmap
-
-      if (map) {
-        map.panTo({
-          lat: resp.data.coord.lat,
-          lng: resp.data.coord.lon,
-        })
-
-        if (!initial) {
-          setTimeout(() => {
-            smoothZoomIn(window.gmap, 10, window.gmap.getZoom())
-          }, 250)
-        }
-      }
     } else {
-      this.dragged = true
-
       this.setState({
         ...initialState,
-        data: resp.data,
-        notFound: false,
-        coords,
+        notFound: true,
       })
-
-      const city = resp.data.name
-      const country = (resp.data.sys && resp.data.sys.country) || ''
-
-      this.form.setFieldValue('city', city)
-      this.form.setFieldValue('country', country.toLowerCase())
     }
   }
 
@@ -165,9 +132,48 @@ class App extends React.Component {
     this.setState({ mapStyleKey })
   }
 
+  mapZoom = delay => {
+    const map = window.gmap
+
+    if (map) {
+      setTimeout(() => {
+        smoothZoomIn(map, SETTINGS.CLOSEUP_ZOOM, map.getZoom())
+      }, delay)
+    }
+  }
+
+  mapPan = position => {
+    const map = window.gmap
+
+    if (map) {
+      map.panTo(position)
+    }
+  }
+
+  weatherToMapPos = ({ coord }) => {
+    return {
+      lat: coord.lat,
+      lng: coord.lon,
+    }
+  }
+
+  mapToWeatherPos = ({ lat, lng }) => {
+    return {
+      lat,
+      lon: lng,
+    }
+  }
+
+  locationToWeatherPos = ({ coords }) => {
+    return {
+      lat: coords.latitude,
+      lon: coords.longitude,
+    }
+  }
+
   render() {
     const { handleFormChange, handleDrag, handleMapStyleChange, form } = this
-    const { loading, data, coords, notFound, mapStyleKey } = this.state
+    const { loading, data, notFound, mapStyleKey, position } = this.state
     const weather = data && data.weather && data.weather[0]
     const mapStyle = mapStyles[mapStyleKey]
 
@@ -180,13 +186,17 @@ class App extends React.Component {
         >
           <div className="App__media-inner">
             <Map
-              mapStyle={mapStyle}
               containerElement={<div style={{ height: '100%', opacity: 1 }} />}
-              googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyDkrrRqeUXM8C--BEfoXeLoEYBwV3YOjYQ&libraries=visualization"
+              defaultPosition={SETTINGS.DEFAULT_POSITION}
+              defaultZoom={SETTINGS.DEFAULT_ZOOM}
+              googleMapURL={`${SETTINGS.GOOGLE_URL_MAPS}?key=${SETTINGS.GOOGLE_KEY}`}
               loadingElement={<div style={{ height: '100%' }} />}
               mapElement={<div style={{ height: '100%' }} />}
-              position={{ lat: coords.lat, lng: coords.lng }}
+              mapStyle={mapStyle}
+              maxZoom={SETTINGS.MAX_ZOOM}
+              minZoom={SETTINGS.MIN_ZOOM}
               onDragEnd={handleDrag}
+              position={position}
             />
             <div className="App__mapstylepicker">
               <MapStylePicker value={this.state.mapStyleKey} onChange={handleMapStyleChange} />

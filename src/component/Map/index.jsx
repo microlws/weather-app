@@ -19,44 +19,47 @@ class Map extends React.Component {
 
   render() {
     const { handleLoaded } = this
-    const { position, onDragEnd, mapStyle } = this.props
+    const { defaultPosition, position, onDragEnd, mapStyle, maxZoom, minZoom, defaultZoom } = this.props
 
     return (
       <GoogleMap
         ref={r => {
           this.gmap = r
         }}
-        defaultZoom={6}
-        defaultCenter={position}
-        center={position}
+        defaultZoom={defaultZoom}
+        defaultCenter={defaultPosition}
         onTilesLoaded={handleLoaded}
         onDragEnd={onDragEnd}
         options={{
-          disablePanMomentum: true,
-          mapTypeControl: false,
-          maxZoom: 15,
-          minZoom: 3,
-          panControl: false,
-          scaleControl: false,
-          streetViewControl: false,
-          zoomControl: false,
+          maxZoom: maxZoom,
+          minZoom: minZoom,
           styles: mapStyle,
           disableDefaultUI: true,
         }}
       >
-        <PositionMarker position={position} />
+        {position && <PositionMarker position={position} />}
       </GoogleMap>
     )
   }
 }
 
 Map.propTypes = {
-  position: PropTypes.shape({
+  defaultPosition: PropTypes.shape({
     lat: PropTypes.number.isRequired,
     lng: PropTypes.number.isRequired,
   }).isRequired,
+  position: PropTypes.oneOfType([
+    PropTypes.shape({
+      lat: PropTypes.number.isRequired,
+      lng: PropTypes.number.isRequired,
+    }),
+    PropTypes.bool,
+  ]).isRequired,
   onDragEnd: PropTypes.func.isRequired,
   mapStyle: PropTypes.array.isRequired,
+  minZoom: PropTypes.number.isRequired,
+  maxZoom: PropTypes.number.isRequired,
+  defaultZoom: PropTypes.number.isRequired,
 }
 
 export default withScriptjs(withGoogleMap(Map))
