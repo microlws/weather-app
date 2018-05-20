@@ -266,6 +266,6 @@ export const countryNames = Object.keys(_countryCodeMap).map(key => ({
   value: key,
 }))
 
-export const getCountryNameFromCode = code => (_countryCodeMap[code] || '')
+export const getCountryNameFromCode = code => (_countryCodeMap[code.toUpperCase()] || '')
 
-export const getCountryCodeFromName = name => (_countryNameMap[name] || '')
+export const getCountryCodeFromName = name => (_countryNameMap[name.toUpperCase()] || '')

@@ -1,0 +1,97 @@
+.Report__icon {
+  height: 96.7136px;
+  left: 10px;
+  position: absolute;
+  top: 10px;
+  width: 100px; }
+
+.Report__temperature {
+  color: #FFFFFF;
+  font-size: 45px;
+  font-weight: 900;
+  left: 22px;
+  position: absolute;
+  text-shadow: 2px 2px 4px rgba(88, 88, 88, .9);
+  top: 11px; }
+
+.Report__location {
+  color: #FFFFFF;
+  font-size: 25px;
+  font-weight: 900;
+  left: 120px;
+  position: absolute;
+  text-shadow: 2px 2px 4px rgba(88, 88, 88, .9);
+  top: 18px; }
+
+.Report__country {
+  color: #FFFFFF;
+  font-size: 20px;
+  font-weight: 700;
+  left: 120px;
+  position: absolute;
+  text-shadow: 2px 2px 4px rgba(88, 88, 88, .9);
+  top: 48px; }
+
+.App {
+  min-width: 500px;
+  width: 50%; }
+  .App__media {
+    height: 400px; }
+  .App__media-inner {
+    height: 100%;
+    position: relative; }
+  .App__media-overlay {
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0; }
+  .App__notfound {
+    color: #FFFFFF;
+    font-size: 25px;
+    font-weight: 900;
+    left: 18px;
+    position: absolute;
+    text-shadow: 2px 2px 4px rgba(88, 88, 88, .9);
+    top: 18px; }
+  .App__field {
+    margin-bottom: 16px !important; }
+  .App__actions {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: flex-end; }
+
+html,
+body {
+  font-family: Roboto;
+  margin: 0;
+  padding: 0; }
+
+#root {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0; }
+
+
+/*# sourceMappingURL=2.0fef3b616b19ddda6d04.css.map*/

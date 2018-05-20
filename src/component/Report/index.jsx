@@ -116,10 +116,14 @@ class Report extends React.Component {
   render() {
     return (
       <div className="Report">
-        <img className="Report__icon" src={`../../assets/image/weather/${this.state.icon}.png`} alt="" />
-        <div className="Report__temperature">{`${Math.floor(this.props.temp)}°`}</div>
-        <div className="Report__location">{this.props.location}</div>
-        <div className="Report__country">{getCountryNameFromCode(this.props.country)}</div>
+        <img className="Report__icon" src={`assets/image/weather/${this.state.icon}.png`} alt="" />
+        <div className="Report__info">
+          <div className="Report__temperature">{`${Math.floor(this.props.temp)}°`}</div>
+          <div className="Report__locale">
+            <div className="Report__location">{this.props.location}</div>
+            <div className="Report__country">{getCountryNameFromCode(this.props.country)}</div>
+          </div>
+        </div>
       </div>
     )
   }

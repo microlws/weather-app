@@ -6,44 +6,13 @@ import parse from 'autosuggest-highlight/parse'
 import TextField from '@material-ui/core/TextField'
 import Paper from '@material-ui/core/Paper'
 import MenuItem from '@material-ui/core/MenuItem'
+import { countryCodes } from 'tools/countries'
 import { withStyles } from '@material-ui/core/styles'
+import { getCountryNameFromCode } from '../../tools/countries'
 
-const suggestions = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-]
+const suggestions = countryCodes.map(item => ({
+  label: item.value,
+}))
 
 function renderInput(inputProps) {
   const { classes, ref, ...other } = inputProps
@@ -51,6 +20,7 @@ function renderInput(inputProps) {
   return (
     <TextField
       fullWidth
+      label="Country"
       InputProps={{
         inputRef: ref,
         classes: {
@@ -147,6 +117,22 @@ class CountrySuggest extends React.Component {
     suggestions: [],
   }
 
+  componentWillMount() {
+    const value = this.props.field.value
+
+    if (value) {
+      this.setState({ value })
+    }
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    const { field } = this.props
+
+    if (field.value !== nextProps.field.value) {
+      this.setState({ value: getCountryNameFromCode(nextProps.field.value) })
+    }
+  }
+
   handleSuggestionsFetchRequested = ({ value }) => {
     this.setState({
       suggestions: getSuggestions(value),
@@ -163,42 +149,54 @@ class CountrySuggest extends React.Component {
     this.setState({
       value: newValue,
     })
+
+    const value = getCountryNameFromCode(newValue)
+
+    if (value) {
+      event.target.value = value
+      this.props.onChange(event)
+    }
   }
 
   render() {
-    const { classes } = this.props
-
-    console.log(this.props.value)
+    const { classes, field, onChange, onBlur } = this.props
 
     return (
-      <Autosuggest
-        theme={{
-          container: classes.container,
-          suggestionsContainerOpen: classes.suggestionsContainerOpen,
-          suggestionsList: classes.suggestionsList,
-          suggestion: classes.suggestion,
-        }}
-        renderInputComponent={renderInput}
-        suggestions={this.state.suggestions}
-        onSuggestionsFetchRequested={this.handleSuggestionsFetchRequested}
-        onSuggestionsClearRequested={this.handleSuggestionsClearRequested}
-        renderSuggestionsContainer={renderSuggestionsContainer}
-        getSuggestionValue={getSuggestionValue}
-        renderSuggestion={renderSuggestion}
-        inputProps={{
-          classes,
-          placeholder: 'Search a country (start with a)',
-          value: this.state.value,
-          onChange: this.handleChange,
-        }}
-      />
+      <div>
+        <input type="hidden" name={field.name} id={field.id} value={field.value} />
+        <Autosuggest
+          theme={{
+            container: classes.container,
+            suggestionsContainerOpen: classes.suggestionsContainerOpen,
+            suggestionsList: classes.suggestionsList,
+            suggestion: classes.suggestion,
+          }}
+          renderInputComponent={renderInput}
+          suggestions={this.state.suggestions}
+          onSuggestionsFetchRequested={this.handleSuggestionsFetchRequested}
+          onSuggestionsClearRequested={this.handleSuggestionsClearRequested}
+          renderSuggestionsContainer={renderSuggestionsContainer}
+          getSuggestionValue={getSuggestionValue}
+          renderSuggestion={renderSuggestion}
+          inputProps={{
+            classes,
+            placeholder: 'Search a country',
+            value: this.state.value,
+            onChange: this.handleChange,
+            onBlur: this.props.onBlur,
+            disabled: this.props.disabled,
+          }}
+        />
+      </div>
     )
   }
 }
 
 CountrySuggest.propTypes = {
   classes: PropTypes.object.isRequired,
-  value: PropTypes.string.isRequired,
+  field: PropTypes.any.isRequired,
+  onBlur: PropTypes.func.isRequired,
+  disabled: PropTypes.bool.isRequired,
 }
 
 export default withStyles(styles)(CountrySuggest)

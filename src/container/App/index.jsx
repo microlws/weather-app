@@ -1,5 +1,4 @@
 import { Button, Card, CardActions, CardContent, CardMedia, TextField } from '@material-ui/core'
-import 'babel-polyfill'
 import { Form, Formik, Field } from 'formik'
 import React from 'react'
 import Map from 'component/Map'
@@ -163,8 +162,11 @@ class App extends React.Component {
         coords,
       })
 
-      this.form.setFieldValue('city', resp.data.name)
-      this.form.setFieldValue('country', resp.data.sys.country.toLowerCase())
+      const city = resp.data.name
+      const country = (resp.data.sys && resp.data.sys.country) || ''
+
+      this.form.setFieldValue('city', city)
+      this.form.setFieldValue('country', country.toLowerCase())
     }
   }
 
@@ -215,70 +217,77 @@ class App extends React.Component {
             city: '',
             country: '',
           }}
-          render={({ values, dirty, handleChange, handleBlur, handleSubmit }) => (
-            <Form className="App__form" onSubmit={handleSubmit}>
-              <CardContent className="App_content">
-                <Field
-                  name="city"
-                  value={values.city}
-                  render={({ field }) => (
-                    <TextField
-                      className="App__field App__field-city"
-                      label="City"
-                      value={field.value}
-                      name={field.name}
-                      id={field.name}
-                      disabled={loading}
-                      fullWidth
-                      onChange={e => {
-                        const { value } = e.target
-                        const map = window.gmap
+          render={({ values, dirty, handleChange, handleBlur, handleSubmit }) => {
+            console.log(values)
+            return (
+              <Form className="App__form" onSubmit={handleSubmit}>
+                <CardContent className="App_content">
+                  <Field
+                    name="city"
+                    value={values.city}
+                    render={({ field }) => (
+                      <TextField
+                        className="App__field App__field-city"
+                        label="City"
+                        value={field.value}
+                        name={field.name}
+                        id={field.name}
+                        disabled={loading}
+                        fullWidth
+                        onChange={e => {
+                          const { value } = e.target
+                          const map = window.gmap
 
-                        if (!value && map) {
-                          smoothZoomOut(map, 6, map.getZoom())
-                        }
+                          if (!value && map) {
+                            smoothZoomOut(map, 6, map.getZoom())
+                          }
 
-                        handleChange(e)
-                      }}
-                      onBlur={handleBlur}
-                      onFocus={self => {
-                        const { value } = self.target
-                        const map = window.gmap
+                          handleChange(e)
+                        }}
+                        onBlur={handleBlur}
+                        onFocus={self => {
+                          const { value } = self.target
+                          const map = window.gmap
 
-                        if (map && value) {
-                          smoothZoomOut(map, 6, map.getZoom())
-                        }
+                          if (map && value) {
+                            smoothZoomOut(map, 6, map.getZoom())
+                          }
 
-                        if (form) {
-                          form.setFieldValue('city', '')
-                          form.setFieldValue('country', '')
-                        }
-                      }}
-                    />
-                  )}
-                />
-                <Field
-                  className="yo"
-                  name="country"
-                  value={values.country}
-                  render={({ field }) => (
-                    <CountrySuggest name={field.name} value={field.value} onBlur={handleBlur} onChange={handleChange} />
-                  )}
-                />
-              </CardContent>
-              <CardActions className="App__actions">
-                <Button
-                  className="App__button App__button-submit"
-                  color="primary"
-                  type="submit"
-                  disabled={loading || !dirty || values.city === ''}
-                  size="small"
-                >
-                  Get Weather
-                </Button>
-              </CardActions>
-            </Form>
-          )}
+                          if (form) {
+                            form.setFieldValue('city', '')
+                            form.setFieldValue('country', '')
+                          }
+                        }}
+                      />
+                    )}
+                  />
+                  <Field
+                    name="country"
+                    value={values.country}
+                    render={({ field }) => (
+                      <CountrySuggest
+                        disabled={values.city === ''}
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        field={field}
+                      />
+                    )}
+                  />
+                </CardContent>
+                <CardActions className="App__actions">
+                  <Button
+                    className="App__button App__button-submit"
+                    color="primary"
+                    type="submit"
+                    disabled={loading || !dirty || values.city === ''}
+                    size="small"
+                  >
+                    Get Weather
+                  </Button>
+                </CardActions>
+              </Form>
+            )
+          }}
         />
       </Card>
     )
