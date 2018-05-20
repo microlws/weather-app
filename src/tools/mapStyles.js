@@ -647,7 +647,6 @@ export const apple = [{
   }
 ]
 
-
 export const flat = [{
     "featureType": "all",
     "elementType": "labels",

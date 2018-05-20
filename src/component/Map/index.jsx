@@ -1,6 +1,7 @@
 import { GoogleMap, withGoogleMap, withScriptjs } from 'react-google-maps'
 import React from 'react'
 import PropTypes from 'prop-types'
+import PositionMarker from '../PositionMarker'
 
 class Map extends React.Component {
   constructor(props) {
@@ -42,7 +43,9 @@ class Map extends React.Component {
           styles: mapStyle,
           disableDefaultUI: true,
         }}
-      />
+      >
+        <PositionMarker position={position} />
+      </GoogleMap>
     )
   }
 }
