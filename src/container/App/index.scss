@@ -14,6 +14,14 @@
     right: 0;
     top: 0;
   }
+  &__media-report {
+    position: relative;
+  }
+  &__mapstylepicker {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
   &__notfound {
     color: #FFFFFF;
     font-size: 25px;

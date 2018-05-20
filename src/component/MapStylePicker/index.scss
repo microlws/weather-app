@@ -1,0 +1,14 @@
+.MapStylePicker {
+  position: relative;
+  &__card {
+    padding-right: 28px;
+    padding-top: 28px;
+    z-index: 100;
+  }
+  &__button {
+    position: absolute !important;
+    right: 8px;
+    top: 8px;
+    z-index: 200;
+  }
+}

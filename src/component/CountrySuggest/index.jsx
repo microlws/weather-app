@@ -8,7 +8,7 @@ import Paper from '@material-ui/core/Paper'
 import MenuItem from '@material-ui/core/MenuItem'
 import { countryCodes } from 'tools/countries'
 import { withStyles } from '@material-ui/core/styles'
-import { getCountryNameFromCode } from '../../tools/countries'
+import { getCountryNameFromCode, getCountryCodeFromName } from '../../tools/countries'
 
 const suggestions = countryCodes.map(item => ({
   label: item.value,
@@ -150,12 +150,9 @@ class CountrySuggest extends React.Component {
       value: newValue,
     })
 
-    const value = getCountryNameFromCode(newValue)
+    const value = getCountryCodeFromName(newValue)
 
-    if (value) {
-      event.target.value = value
-      this.props.onChange(event)
-    }
+    this.props.form.setFieldValue(this.props.field.name, value)
   }
 
   render() {
@@ -163,7 +160,7 @@ class CountrySuggest extends React.Component {
 
     return (
       <div>
-        <input type="hidden" name={field.name} id={field.id} value={field.value} />
+        <input type="hidden" value={field.value} />
         <Autosuggest
           theme={{
             container: classes.container,
@@ -184,7 +181,8 @@ class CountrySuggest extends React.Component {
             value: this.state.value,
             onChange: this.handleChange,
             onBlur: this.props.onBlur,
-            disabled: this.props.disabled,
+            name: field.name,
+            id: field.id,
           }}
         />
       </div>
@@ -195,8 +193,8 @@ class CountrySuggest extends React.Component {
 CountrySuggest.propTypes = {
   classes: PropTypes.object.isRequired,
   field: PropTypes.any.isRequired,
+  form: PropTypes.any.isRequired,
   onBlur: PropTypes.func.isRequired,
-  disabled: PropTypes.bool.isRequired,
 }
 
 export default withStyles(styles)(CountrySuggest)

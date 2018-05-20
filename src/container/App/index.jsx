@@ -4,6 +4,7 @@ import React from 'react'
 import Map from 'component/Map'
 import Report from 'component/Report'
 import CountrySuggest from 'component/CountrySuggest'
+import MapStylePicker from 'component/MapStylePicker'
 import { fetchGeoLocation, fetchWeatherByCity, fetchWeatherByLocation } from 'tools/weather'
 import * as mapStyles from 'tools/mapStyles'
 import './index.scss'
@@ -44,7 +45,6 @@ const initialState = {
   notFound: false,
   loading: false,
   data: false,
-  mapStyleKey: 'apple',
   coords: {
     lat: 51,
     lng: 0,
@@ -52,18 +52,9 @@ const initialState = {
 }
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.dragged = false
-    this.form = null
-    this.state = { ...initialState }
-
-    this.updateWeather = this.updateWeather.bind(this)
-    this.handleFormChange = this.handleFormChange.bind(this)
-    this.initLocation = this.initLocation.bind(this)
-    this.handleDrag = this.handleDrag.bind(this)
-  }
+  dragged = false
+  form = null
+  state = { ...initialState, mapStyleKey: 'flat' }
 
   componentWillMount() {
     if (window.navigator && window.navigator.geolocation) {
@@ -73,7 +64,7 @@ class App extends React.Component {
     }
   }
 
-  async handleDrag() {
+  handleDrag = async () => {
     this.dragged = true
 
     const center = window.gmap.getCenter()
@@ -91,13 +82,13 @@ class App extends React.Component {
     })
   }
 
-  async handleFormChange(values) {
+  handleFormChange = async values => {
     const resp = await fetchWeatherByCity(values)
 
     this.updateWeather(resp)
   }
 
-  async initLocation(useDefaults) {
+  initLocation = async useDefaults => {
     const { state } = this
 
     if (!useDefaults) {
@@ -124,7 +115,7 @@ class App extends React.Component {
     }
   }
 
-  updateWeather(resp, coords = false, initial = false) {
+  updateWeather = (resp, coords = false, initial = false) => {
     if (!resp) {
       this.setState({ ...initialState, notFound: true })
     } else if (resp === 404) {
@@ -170,8 +161,12 @@ class App extends React.Component {
     }
   }
 
+  handleMapStyleChange = mapStyleKey => {
+    this.setState({ mapStyleKey })
+  }
+
   render() {
-    const { handleFormChange, handleDrag, form } = this
+    const { handleFormChange, handleDrag, handleMapStyleChange, form } = this
     const { loading, data, coords, notFound, mapStyleKey } = this.state
     const weather = data && data.weather && data.weather[0]
     const mapStyle = mapStyles[mapStyleKey]
@@ -193,17 +188,22 @@ class App extends React.Component {
               position={{ lat: coords.lat, lng: coords.lng }}
               onDragEnd={handleDrag}
             />
+            <div className="App__mapstylepicker">
+              <MapStylePicker value={this.state.mapStyleKey} onChange={handleMapStyleChange} />
+            </div>
             {notFound && <div className="App__notfound">Could not find city</div>}
             {weather && (
               <div className="App__media-overlay">
-                <Report
-                  id={weather.id}
-                  location={data.name}
-                  icon={weather.icon}
-                  timestamp={data.dt}
-                  temp={data.main.temp}
-                  country={data.sys.country}
-                />
+                <div className="App__media-report">
+                  <Report
+                    id={weather.id}
+                    location={data.name}
+                    icon={weather.icon}
+                    timestamp={data.dt}
+                    temp={data.main.temp}
+                    country={(data.sys && data.sys.country) || ''}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -218,7 +218,6 @@ class App extends React.Component {
             country: '',
           }}
           render={({ values, dirty, handleChange, handleBlur, handleSubmit }) => {
-            console.log(values)
             return (
               <Form className="App__form" onSubmit={handleSubmit}>
                 <CardContent className="App_content">
@@ -252,11 +251,6 @@ class App extends React.Component {
                           if (map && value) {
                             smoothZoomOut(map, 6, map.getZoom())
                           }
-
-                          if (form) {
-                            form.setFieldValue('city', '')
-                            form.setFieldValue('country', '')
-                          }
                         }}
                       />
                     )}
@@ -264,13 +258,8 @@ class App extends React.Component {
                   <Field
                     name="country"
                     value={values.country}
-                    render={({ field }) => (
-                      <CountrySuggest
-                        disabled={values.city === ''}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        field={field}
-                      />
+                    render={({ field, form }) => (
+                      <CountrySuggest onBlur={handleBlur} onChange={handleChange} form={form} field={field} />
                     )}
                   />
                 </CardContent>
