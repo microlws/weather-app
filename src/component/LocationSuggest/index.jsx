@@ -109,7 +109,7 @@ class LocationSuggest extends React.Component {
           label="Location"
           onFocus={this.handleFocus}
           InputProps={{
-            placeholder: 'Enter minimum 2 characters to search',
+            placeholder: 'Type to search',
             startAdornment: (
               <InputAdornment position="start">
                 <Search />

@@ -55,8 +55,6 @@ class Options extends React.Component {
     const { handleClick, actionList } = this
     const { options } = this.props
 
-    console.log('updating list')
-
     return (
       <div className="Options">
         <List className="Options__list">
