@@ -138,6 +138,16 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
+"@types/google-maps@*":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@types/google-maps/-/google-maps-3.2.0.tgz#804a3ae9ac9265b4e0d1508b5b9b894867974f82"
+  dependencies:
+    "@types/googlemaps" "*"
+
+"@types/googlemaps@*", "@types/googlemaps@^3.30.8":
+  version "3.30.8"
+  resolved "https://registry.yarnpkg.com/@types/googlemaps/-/googlemaps-3.30.8.tgz#cc6ab90f79f3a8b799860ea1d70252a221af702e"
+
 "@types/jss@^9.5.3":
   version "9.5.3"
   resolved "https://registry.yarnpkg.com/@types/jss/-/jss-9.5.3.tgz#0c106de3fe0b324cd4173fac7dab26c12cda624e"
@@ -145,13 +155,19 @@
     csstype "^2.0.0"
     indefinite-observable "^1.0.1"
 
+"@types/markerclustererplus@^2.1.33":
+  version "2.1.33"
+  resolved "https://registry.yarnpkg.com/@types/markerclustererplus/-/markerclustererplus-2.1.33.tgz#0542a2fabdf46fa474a3de00df5b0b399f5694a5"
+  dependencies:
+    "@types/google-maps" "*"
+
 "@types/react-transition-group@^2.0.8":
   version "2.0.9"
   resolved "https://registry.yarnpkg.com/@types/react-transition-group/-/react-transition-group-2.0.9.tgz#ed6a71fb711e524345844defec2a861c1a222a03"
   dependencies:
     "@types/react" "*"
 
-"@types/react@*":
+"@types/react@*", "@types/react@^16.3.14":
   version "16.3.14"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.3.14.tgz#f90ac6834de172e13ecca430dcb6814744225d36"
   dependencies:
@@ -5723,6 +5739,10 @@ moment@^2.22.1:
   version "2.22.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.1.tgz#529a2e9bf973f259c9643d237fda84de3a26e8ad"
 
+mousetrap@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/mousetrap/-/mousetrap-1.6.1.tgz#2a085f5c751294c75e7e81f6ec2545b29cbf42d9"
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/move-concurrently/-/move-concurrently-1.0.1.tgz#be2c005fda32e0b29af1f05d7c4b33214c701f92"
@@ -7148,7 +7168,7 @@ preserve@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/preserve/-/preserve-0.2.0.tgz#815ed1f6ebc65926f865b310c0713bcb3315ce4b"
 
-prettier@^1.5.3:
+prettier@^1.12.1, prettier@^1.5.3:
   version "1.12.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.12.1.tgz#c1ad20e803e7749faf905a409d2367e06bbe7325"
 
@@ -7422,6 +7442,12 @@ react-jss@^8.1.0:
 react-lifecycles-compat@^3.0.2:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
+
+react-mousetrap@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/react-mousetrap/-/react-mousetrap-0.2.0.tgz#2ba95b31e3f32a6d1072a52e49c62ecd498e0f0a"
+  dependencies:
+    mousetrap "^1.6.1"
 
 react-popper@^0.10.0:
   version "0.10.4"
@@ -8237,6 +8263,10 @@ shallow-clone@^1.0.0:
 shallow-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shallow-equal/-/shallow-equal-1.0.0.tgz#508d1838b3de590ab8757b011b25e430900945f7"
+
+shallowequal@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-1.0.2.tgz#1561dbdefb8c01408100319085764da3fcf83f8f"
 
 shebang-command@^1.2.0:
   version "1.2.0"

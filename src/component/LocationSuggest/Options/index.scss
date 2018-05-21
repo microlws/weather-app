@@ -1,8 +1,7 @@
 @import "scss/variable/colors";
 .Options {
   margin-top: 16px;
-  &__item:hover {
-    background-color: $color-gray--light;
-    cursor: pointer;
+  &__button {
+    padding: 0 !important;
   }
 }
