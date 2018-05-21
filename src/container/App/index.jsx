@@ -1,15 +1,16 @@
-import { Button, Card, CardActions, CardContent, CardMedia, TextField } from '@material-ui/core'
-import { Form, Formik, Field } from 'formik'
+import { Card, CardContent, CardMedia, TextField } from '@material-ui/core'
 import axios from 'axios'
 import React from 'react'
 import Map from 'component/Map'
 import Report from 'component/Report'
 import CountrySuggest from 'component/CountrySuggest'
 import MapStylePicker from 'component/MapStylePicker'
-import { fetchGeoLocation, fetchWeatherByCity, fetchWeatherByLocation } from 'tools/weather'
+import LocationSuggest from 'component/LocationSuggest'
+import { fetchGeoLocation, fetchWeatherByLocation } from 'tools/weather'
 import { getCountryNameFromCode } from 'tools/countries'
 import { smoothZoomIn, smoothZoomOut } from 'tools/googleZoom'
 import * as mapStyles from 'tools/mapStyles'
+import CssBaseline from '@material-ui/core/CssBaseline'
 import './index.scss'
 
 const SETTINGS = {
@@ -35,7 +36,9 @@ const initialState = {
 
 class App extends React.Component {
   dragged = false
-  form = null
+
+  pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+
   state = { ...initialState, mapStyleKey: 'flat' }
 
   componentWillMount() {
@@ -73,15 +76,16 @@ class App extends React.Component {
       }
 
       updateWeather(weather)
-      mapPan(position)
+      // mapPan(position)
 
       google.maps.event.removeListener(z)
     })
   }
 
-  handleFormChange = async values => {
-    const { weatherToMapPos, updateWeather, mapPan, mapZoom } = this
-    const response = await fetchWeatherByCity(values)
+  handleFormChange = async ({ position }) => {
+    const { weatherToMapPos, mapToWeatherPos, updateWeather, mapPan, mapZoom } = this
+
+    const response = await fetchWeatherByLocation(mapToWeatherPos(position))
 
     updateWeather(response)
     mapPan(weatherToMapPos(response.data))
@@ -172,123 +176,56 @@ class App extends React.Component {
   }
 
   render() {
-    const { handleFormChange, handleDrag, handleMapStyleChange, form } = this
+    const { handleFormChange, handleDrag, handleMapStyleChange, pixel } = this
     const { loading, data, notFound, mapStyleKey, position } = this.state
     const weather = data && data.weather && data.weather[0]
     const mapStyle = mapStyles[mapStyleKey]
 
     return (
-      <Card className="App">
-        <CardMedia
-          className="App__media"
-          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-          title="Weather App"
-        >
-          <div className="App__media-inner">
-            <Map
-              containerElement={<div style={{ height: '100%', opacity: 1 }} />}
-              defaultPosition={SETTINGS.DEFAULT_POSITION}
-              defaultZoom={SETTINGS.DEFAULT_ZOOM}
-              googleMapURL={`${SETTINGS.GOOGLE_URL_MAPS}?key=${SETTINGS.GOOGLE_KEY}`}
-              loadingElement={<div style={{ height: '100%' }} />}
-              mapElement={<div style={{ height: '100%' }} />}
-              mapStyle={mapStyle}
-              maxZoom={SETTINGS.MAX_ZOOM}
-              minZoom={SETTINGS.MIN_ZOOM}
-              onDragEnd={handleDrag}
-              position={position}
-            />
-            <div className="App__mapstylepicker">
-              <MapStylePicker value={this.state.mapStyleKey} onChange={handleMapStyleChange} />
-            </div>
-            {notFound && <div className="App__notfound">Could not find city</div>}
-            {weather && (
-              <div className="App__media-overlay">
-                <div className="App__media-report">
-                  <Report
-                    id={weather.id}
-                    location={data.name}
-                    icon={weather.icon}
-                    timestamp={data.dt}
-                    temp={data.main.temp}
-                    country={(data.sys && data.sys.country) || ''}
-                  />
-                </div>
+      <CssBaseline>
+        <Card className="App">
+          <CardMedia className="App__media" src={pixel} title="Weather App">
+            <div className="App__media-inner">
+              <Map
+                containerElement={<div style={{ height: '100%', opacity: 1 }} />}
+                defaultPosition={SETTINGS.DEFAULT_POSITION}
+                defaultZoom={SETTINGS.DEFAULT_ZOOM}
+                googleMapURL={`${SETTINGS.GOOGLE_URL_MAPS}?key=${SETTINGS.GOOGLE_KEY}`}
+                loadingElement={<div style={{ height: '100%' }} />}
+                mapElement={<div style={{ height: '100%' }} />}
+                mapStyle={mapStyle}
+                maxZoom={SETTINGS.MAX_ZOOM}
+                minZoom={SETTINGS.MIN_ZOOM}
+                onDragEnd={handleDrag}
+                position={position}
+              />
+              <div className="App__mapstylepicker">
+                <MapStylePicker value={this.state.mapStyleKey} onChange={handleMapStyleChange} />
               </div>
-            )}
-          </div>
-        </CardMedia>
-        <Formik
-          onSubmit={values => handleFormChange(values)}
-          ref={r => {
-            this.form = r
-          }}
-          initialValues={{
-            city: '',
-            country: '',
-          }}
-          render={({ values, dirty, handleChange, handleBlur, handleSubmit }) => {
-            return (
-              <Form className="App__form" onSubmit={handleSubmit}>
-                <CardContent className="App_content">
-                  <Field
-                    name="city"
-                    value={values.city}
-                    render={({ field }) => (
-                      <TextField
-                        className="App__field App__field-city"
-                        label="City"
-                        value={field.value}
-                        name={field.name}
-                        id={field.name}
-                        disabled={loading}
-                        fullWidth
-                        onChange={e => {
-                          const { value } = e.target
-                          const map = window.gmap
-
-                          if (!value && map) {
-                            smoothZoomOut(map, 6, map.getZoom())
-                          }
-
-                          handleChange(e)
-                        }}
-                        onBlur={handleBlur}
-                        onFocus={self => {
-                          const { value } = self.target
-                          const map = window.gmap
-
-                          if (map && value) {
-                            smoothZoomOut(map, 6, map.getZoom())
-                          }
-                        }}
-                      />
-                    )}
-                  />
-                  <Field
-                    name="country"
-                    value={values.country}
-                    render={({ field, form }) => (
-                      <CountrySuggest onBlur={handleBlur} onChange={handleChange} form={form} field={field} />
-                    )}
-                  />
-                </CardContent>
-                <CardActions className="App__actions">
-                  <Button
-                    className="App__button App__button-submit"
-                    color="primary"
-                    type="submit"
-                    disabled={loading || !dirty || values.city === ''}
-                    size="small"
-                  >
-                    Get Weather
-                  </Button>
-                </CardActions>
-              </Form>
-            )
-          }}
-        />
-      </Card>
+              {notFound && <div className="App__notfound">Could not find city</div>}
+              {weather && (
+                <div className="App__media-overlay">
+                  <div className="App__media-report">
+                    <Report
+                      id={weather.id}
+                      location={data.name}
+                      icon={weather.icon}
+                      timestamp={data.dt}
+                      temp={data.main.temp}
+                      country={(data.sys && data.sys.country) || ''}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardMedia>
+          <CardContent className="App_content">
+            <div className="App__locations">
+              <LocationSuggest onChange={handleFormChange} />
+            </div>
+          </CardContent>
+        </Card>
+      </CssBaseline>
     )
   }
 }

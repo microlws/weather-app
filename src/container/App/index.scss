@@ -1,13 +1,6 @@
 .App {
-  min-width: 500px;
-  width: 50%;
-  &__media {
-    height: 400px;
-  }
-  &__media-inner {
-    height: 100%;
-    position: relative;
-  }
+  margin: 32px;
+  width: 70%;
   &__media-overlay {
     left: 0;
     position: absolute;
@@ -31,12 +24,35 @@
     text-shadow: 2px 2px 4px rgba(88, 88, 88, 0.9);
     top: 18px;
   }
-  &__field {
-    margin-bottom: 16px !important;
+  @media screen and (max-width: 1140px) {
+    width: 100%;
   }
-  &__actions {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+  @media screen and (max-width: 800px) {
+    margin: 16px;
+    width: 100%;
+  }
+  @media screen and (max-width: 600px) {
+    margin: 8px;
+    width: 100%;
+    &__media {
+      padding-top: 56.25%;
+      position: relative;
+    }
+    &__media-inner {
+      bottom: 0;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+  }
+  @media screen and (min-width: 600px) {
+    &__media {
+      height: 400px;
+    }
+    &__media-inner {
+      height: 100%;
+      position: relative;
+    }
   }
 }

@@ -1,18 +1,14 @@
 html,
 body {
   font-family: Roboto;
+  font-size: 14px;
   margin: 0;
   padding: 0;
 }
 
 #root {
-  align-items: center;
-  bottom: 0;
   display: flex;
   flex-direction: row;
+  height: 100%;
   justify-content: center;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
 }

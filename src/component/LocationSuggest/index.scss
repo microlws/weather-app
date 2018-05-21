@@ -1,0 +1,19 @@
+@import "scss/variable/colors";
+.LocationSuggest {
+  position: relative;
+  &__options {
+    left: 0;
+    position: absolute;
+    right: 0;
+    z-index: 9999;
+  }
+  &__item {
+    &--selected {
+      background-color: $color-gray--light;
+    }
+    &:hover {
+      background-color: $color-gray--light;
+      cursor: pointer;
+    }
+  }
+}

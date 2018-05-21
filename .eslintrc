@@ -27,7 +27,8 @@
       "when": "always"
     }],
     "react/forbid-prop-types": ["any"],
-    "import/prefer-default-export": "off"
+    "import/prefer-default-export": "off",
+    "no-unused-vars": "warn"
   },
   "settings": {
     "import/resolver": {
