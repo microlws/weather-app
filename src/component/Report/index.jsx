@@ -129,11 +129,7 @@ class Report extends React.Component {
   }
 }
 
-/* eslint-disable react/no-unused-prop-types */
 Report.propTypes = {
-  timestamp: PropTypes.number.isRequired,
-  icon: PropTypes.string.isRequired,
-  id: PropTypes.number.isRequired,
   temp: PropTypes.number.isRequired,
   location: PropTypes.string.isRequired,
   country: PropTypes.string.isRequired,

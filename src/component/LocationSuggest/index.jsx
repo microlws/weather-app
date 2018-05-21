@@ -1,16 +1,16 @@
-import React from 'react'
-import PropTypes from 'prop-types'
 import TextField from '@material-ui/core/TextField'
-import Options from './Options'
 import axios from 'axios'
+import PropTypes from 'prop-types'
+import React from 'react'
+import Options from './Options'
 import './index.scss'
 
 class LocationSuggest extends React.Component {
-  timeout = null
-
   state = {
     options: [],
   }
+
+  timeout = null
 
   updateOptions = async inputValue => {
     let options = []
@@ -37,7 +37,7 @@ class LocationSuggest extends React.Component {
   }
 
   handleInputChange = async e => {
-    const { fetchOptions, timeout, updateOptions } = this
+    const { updateOptions } = this
     const { value } = e.target
 
     clearTimeout(this.timeout)
@@ -55,7 +55,7 @@ class LocationSuggest extends React.Component {
           onChange={this.handleInputChange}
           className="LocationSuggest__input"
           label="Location"
-          inputProps={{ name, id: name, placeholder: 'Enter minimum 2 characters to search' }}
+          inputProps={{ placeholder: 'Enter minimum 2 characters to search' }}
           defaultValue=""
         />
         <Options options={this.state.options} onChange={this.props.onChange} />

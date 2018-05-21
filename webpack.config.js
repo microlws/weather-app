@@ -11,7 +11,10 @@ const nodePath = path.join(__dirname, './node_modules')
 
 
 
-module.exports = (env, argv) => {
+module.exports = (env, argv = {
+  mode: 'development'
+}) => {
+  console.log(argv)
   const isProduction = argv.mode === 'production'
 
   const basePlugins = [
@@ -35,9 +38,12 @@ module.exports = (env, argv) => {
       toType: 'dir'
     }])
   ]) : basePlugins.concat([
+    new webpack.LoaderOptionsPlugin({
+      options: {}
+    }),
     new webpack.HotModuleReplacementPlugin({
       // Options...
-    })
+    }),
   ])
 
   return {

@@ -1,14 +1,13 @@
-import { Card, CardContent, CardMedia, TextField } from '@material-ui/core'
+import { Card, CardContent, CardMedia } from '@material-ui/core'
 import axios from 'axios'
 import React from 'react'
 import Map from 'component/Map'
 import Report from 'component/Report'
-import CountrySuggest from 'component/CountrySuggest'
 import MapStylePicker from 'component/MapStylePicker'
 import LocationSuggest from 'component/LocationSuggest'
 import { fetchGeoLocation, fetchWeatherByLocation } from 'tools/weather'
 import { getCountryNameFromCode } from 'tools/countries'
-import { smoothZoomIn, smoothZoomOut } from 'tools/googleZoom'
+import { smoothZoomIn } from 'tools/googleZoom'
 import * as mapStyles from 'tools/mapStyles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import './index.scss'
@@ -35,23 +34,23 @@ const initialState = {
 }
 
 class App extends React.Component {
-  dragged = false
-
-  pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
-
   state = { ...initialState, mapStyleKey: 'flat' }
 
   componentWillMount() {
     this.initLocation(window.navigator && window.navigator.geolocation)
   }
 
+  dragged = false
+
+  pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=='
+
   handleDrag = async () => {
     this.dragged = true
 
-    const { mapToWeatherPos, updateWeather, mapPan } = this
+    const { mapToWeatherPos, updateWeather } = this
     const map = window.gmap
 
-    const z = google.maps.event.addListener(map, 'idle', async () => {
+    const z = window.google.maps.event.addListener(map, 'idle', async () => {
       const center = window.gmap.getCenter()
 
       let position = {
@@ -76,9 +75,8 @@ class App extends React.Component {
       }
 
       updateWeather(weather)
-      // mapPan(position)
 
-      google.maps.event.removeListener(z)
+      window.google.maps.event.removeListener(z)
     })
   }
 
@@ -154,30 +152,24 @@ class App extends React.Component {
     }
   }
 
-  weatherToMapPos = ({ coord }) => {
-    return {
-      lat: coord.lat,
-      lng: coord.lon,
-    }
-  }
+  weatherToMapPos = ({ coord }) => ({
+    lat: coord.lat,
+    lng: coord.lon,
+  })
 
-  mapToWeatherPos = ({ lat, lng }) => {
-    return {
-      lat,
-      lon: lng,
-    }
-  }
+  mapToWeatherPos = ({ lat, lng }) => ({
+    lat,
+    lon: lng,
+  })
 
-  locationToWeatherPos = ({ coords }) => {
-    return {
-      lat: coords.latitude,
-      lon: coords.longitude,
-    }
-  }
+  locationToWeatherPos = ({ coords }) => ({
+    lat: coords.latitude,
+    lon: coords.longitude,
+  })
 
   render() {
     const { handleFormChange, handleDrag, handleMapStyleChange, pixel } = this
-    const { loading, data, notFound, mapStyleKey, position } = this.state
+    const { data, notFound, mapStyleKey, position } = this.state
     const weather = data && data.weather && data.weather[0]
     const mapStyle = mapStyles[mapStyleKey]
 

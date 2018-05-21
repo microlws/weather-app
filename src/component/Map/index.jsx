@@ -31,8 +31,8 @@ class Map extends React.Component {
         onTilesLoaded={handleLoaded}
         onDragEnd={onDragEnd}
         options={{
-          maxZoom: maxZoom,
-          minZoom: minZoom,
+          maxZoom,
+          minZoom,
           styles: mapStyle,
           disableDefaultUI: true,
         }}

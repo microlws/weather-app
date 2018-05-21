@@ -41,7 +41,7 @@ class MapStylePicker extends React.Component {
             </List>
           </Card>
         )}
-        <IconButton className="MapStylePicker__button" color="primary" size="large" onClick={this.handleToggle}>
+        <IconButton className="MapStylePicker__button" color="primary" size="large" onClick={handleToggle}>
           <SettingsIcon />
         </IconButton>
       </div>
@@ -50,7 +50,6 @@ class MapStylePicker extends React.Component {
 }
 
 MapStylePicker.propTypes = {
-  value: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
 }
 
