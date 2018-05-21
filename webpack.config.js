@@ -14,7 +14,6 @@ const nodePath = path.join(__dirname, './node_modules')
 module.exports = (env, argv = {
   mode: 'development'
 }) => {
-  console.log(argv)
   const isProduction = argv.mode === 'production'
 
   const basePlugins = [

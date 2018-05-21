@@ -13,7 +13,7 @@ class Options extends React.Component {
     let option = []
 
     this.props.options.forEach(o => {
-      if (o.id == id) {
+      if (o.id === id) {
         option = o
       }
     })
@@ -28,7 +28,7 @@ class Options extends React.Component {
     return (
       <div className="Options">
         <List className="Options__list">
-          {options.map((option, index) => (
+          {options.map(option => (
             <ListItem
               className="Options__item"
               id={`options-${option.id}`}
