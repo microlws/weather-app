@@ -1,21 +1,19 @@
-import { Card, CardContent, CardMedia } from '@material-ui/core'
+import Card from '@material-ui/core/Card'
+import CardContent from '@material-ui/core/CardContent'
+import CardMedia from '@material-ui/core/CardMedia'
+import CssBaseline from '@material-ui/core/CssBaseline'
 import axios from 'axios'
-import React from 'react'
+import LocationSuggest from 'component/LocationSuggest'
 import Map from 'component/Map'
 import Report from 'component/Report'
-import MapStylePicker from 'component/MapStylePicker'
-import LocationSuggest from 'component/LocationSuggest'
-import { fetchGeoLocation, fetchWeatherByLocation } from 'tools/weather'
-import { getCountryNameFromCode } from 'tools/countries'
-import { smoothZoomIn } from 'tools/googleZoom'
+import React from 'react'
 import * as mapStyles from 'tools/mapStyles'
-import CssBaseline from '@material-ui/core/CssBaseline'
+import { fetchGeoLocation, fetchWeatherByLocation } from 'tools/weather'
 import './index.scss'
 
 const SETTINGS = {
   MAX_ZOOM: 15,
   MIN_ZOOM: 3,
-  CLOSEUP_ZOOM: 10,
   DEFAULT_ZOOM: 6,
   GOOGLE_KEY: 'AIzaSyAP70dQfEIvqOSQ7O8tXMEuErqQsa7V0wE',
   GOOGLE_URL_GEOCODE: 'https://maps.googleapis.com/maps/api/geocode/json',
@@ -26,15 +24,26 @@ const SETTINGS = {
   },
 }
 
-const initialState = {
-  notFound: false,
-  loading: false,
-  data: false,
-  position: false,
+const getAddressInfo = (k, o) => {
+  let f = ''
+
+  o.some(i => {
+    if (i.types.includes(k)) {
+      f = i.long_name
+    }
+    return i.types.includes(k)
+  })
+
+  return f
 }
 
 class App extends React.Component {
-  state = { ...initialState, mapStyleKey: 'flat' }
+  state = {
+    mapStyleKey: 'flat', // or neutralBlue for night
+    data: false,
+    markerPosition: false,
+    location: '',
+  }
 
   componentWillMount() {
     this.initLocation(window.navigator && window.navigator.geolocation)
@@ -47,58 +56,71 @@ class App extends React.Component {
   handleDrag = async () => {
     this.dragged = true
 
-    const { mapToWeatherPos, updateWeather } = this
+    const { mapToWeatherPos, updateWeather, updateLocationByPosition } = this
     const map = window.gmap
 
     const z = window.google.maps.event.addListener(map, 'idle', async () => {
       const center = window.gmap.getCenter()
 
-      let position = {
+      const position = {
         lat: center.lat(),
         lng: center.lng(),
       }
 
       const weather = await fetchWeatherByLocation(mapToWeatherPos(position))
 
-      if (weather && weather.data && weather.data.name) {
-        const geolocation = await axios.get(
-          `${SETTINGS.GOOGLE_URL_GEOCODE}?key=${SETTINGS.GOOGLE_KEY}&address=${
-            weather.data.name
-          }+${getCountryNameFromCode(weather.data.sys.country)}`,
-        )
-        const geoData = geolocation.data
+      updateWeather(weather, position)
+      updateLocationByPosition(position)
 
-        if (geoData && geoData.results && geoData.results.length) {
-          const result = geoData.results[0]
-          position = result.geometry.location
+      // Is it night or day..
+      const weatherData = weather.data.weather[0]
+
+      if (weatherData) {
+        const nightOrDay = weatherData.icon.slice(-1)
+
+        if (nightOrDay === 'n') {
+          this.setState({ mapStyleKey: 'neutralBlue' })
+        } else {
+          this.setState({ mapStyleKey: 'flat' })
         }
       }
-
-      updateWeather(weather)
 
       window.google.maps.event.removeListener(z)
     })
   }
 
-  handleFormChange = async ({ position }) => {
-    const { weatherToMapPos, mapToWeatherPos, updateWeather, mapPan, mapZoom } = this
+  updateLocation = (location = '') => {
+    this.setState({ location })
+  }
+
+  handleFormChange = async ({ position, location }) => {
+    const { mapToWeatherPos, updateWeather, mapPan, updateLocation } = this
 
     const response = await fetchWeatherByLocation(mapToWeatherPos(position))
 
-    updateWeather(response)
-    mapPan(weatherToMapPos(response.data))
-    mapZoom(250)
+    updateLocation(location)
+    updateWeather(response, position)
+    mapPan(position)
   }
 
   initLocation = async useDefaultLocation => {
-    const { dragged, mapToWeatherPos, locationToWeatherPos, weatherToMapPos, updateWeather, mapPan } = this
+    const {
+      dragged,
+      locationToWeatherPos,
+      mapPan,
+      mapToWeatherPos,
+      updateLocationByPosition,
+      updateWeather,
+      weatherToMapPos,
+    } = this
 
     if (!useDefaultLocation) {
       fetchGeoLocation(async geoLocation => {
         const position = geoLocation ? locationToWeatherPos(geoLocation) : mapToWeatherPos(SETTINGS.DEFAULT_POSITION)
         const response = await fetchWeatherByLocation(position)
 
-        updateWeather(response)
+        updateWeather(response, weatherToMapPos(position))
+        updateLocationByPosition(weatherToMapPos(position))
 
         if (!dragged) {
           mapPan(weatherToMapPos(position))
@@ -108,40 +130,46 @@ class App extends React.Component {
       const weatherPos = mapToWeatherPos(SETTINGS.DEFAULT_POSITION)
       const response = await fetchWeatherByLocation(weatherPos)
 
-      updateWeather(response)
+      updateWeather(response, SETTINGS.DEFAULT_POSITION)
+      updateLocationByPosition(SETTINGS.DEFAULT_POSITION)
 
       if (!dragged) {
-        mapPan(weatherToMapPos(response.data))
+        mapPan(weatherToMapPos(response.data.coord))
       }
     }
   }
 
-  updateWeather = response => {
+  updateWeather = (response, position) => {
     if (response && response !== 404) {
-      this.setState({
-        ...initialState,
-        data: response.data,
-      })
+      this.setState({ data: response.data, markerPosition: position })
     } else {
-      this.setState({
-        ...initialState,
-        notFound: true,
-      })
+      this.setState({ data: false })
     }
   }
 
-  handleMapStyleChange = mapStyleKey => {
-    this.setState({ mapStyleKey })
-  }
+  updateLocationByPosition = async ({ lat, lng }) => {
+    let location = ''
 
-  mapZoom = delay => {
-    const map = window.gmap
+    const geolocation = await axios.get(
+      `${SETTINGS.GOOGLE_URL_GEOCODE}?key=${SETTINGS.GOOGLE_KEY}&latlng=${lat},${lng}`,
+    )
+    const geoData = geolocation.data
 
-    if (map) {
-      setTimeout(() => {
-        smoothZoomIn(map, SETTINGS.CLOSEUP_ZOOM, map.getZoom())
-      }, delay)
+    if (geoData && geoData.results && geoData.results.length) {
+      const result = geoData.results[0]
+
+      // Now build our own location string
+      const country = getAddressInfo('country', result.address_components)
+      const locality = getAddressInfo('locality', result.address_components)
+      const postalTown = getAddressInfo('postal_town', result.address_components)
+      const level2 = getAddressInfo('administrative_area_level_2', result.address_components)
+      const level3 = getAddressInfo('administrative_area_level_3', result.address_components)
+      const local = locality || postalTown || level2 || level3
+
+      location = `${local && country ? `${local}, ` : ''}${country}`
     }
+
+    this.updateLocation(location)
   }
 
   mapPan = position => {
@@ -152,9 +180,9 @@ class App extends React.Component {
     }
   }
 
-  weatherToMapPos = ({ coord }) => ({
-    lat: coord.lat,
-    lng: coord.lon,
+  weatherToMapPos = ({ lat, lon }) => ({
+    lat,
+    lng: lon,
   })
 
   mapToWeatherPos = ({ lat, lng }) => ({
@@ -168,8 +196,8 @@ class App extends React.Component {
   })
 
   render() {
-    const { handleFormChange, handleDrag, handleMapStyleChange, pixel } = this
-    const { data, notFound, mapStyleKey, position } = this.state
+    const { handleFormChange, handleDrag, pixel } = this
+    const { data, mapStyleKey, markerPosition, location } = this.state
     const weather = data && data.weather && data.weather[0]
     const mapStyle = mapStyles[mapStyleKey]
 
@@ -177,34 +205,30 @@ class App extends React.Component {
       <CssBaseline>
         <Card className="App">
           <CardMedia className="App__media" src={pixel} title="Weather App">
-            <div className="App__media-inner">
+            <div className="App__map">
               <Map
-                containerElement={<div style={{ height: '100%', opacity: 1 }} />}
+                containerElement={<div style={{ height: '100%' }} />}
                 defaultPosition={SETTINGS.DEFAULT_POSITION}
                 defaultZoom={SETTINGS.DEFAULT_ZOOM}
-                googleMapURL={`${SETTINGS.GOOGLE_URL_MAPS}?key=${SETTINGS.GOOGLE_KEY}`}
+                googleMapURL={`${SETTINGS.GOOGLE_URL_MAPS}?key=${SETTINGS.GOOGLE_KEY}&libraries=places`}
                 loadingElement={<div style={{ height: '100%' }} />}
                 mapElement={<div style={{ height: '100%' }} />}
                 mapStyle={mapStyle}
                 maxZoom={SETTINGS.MAX_ZOOM}
                 minZoom={SETTINGS.MIN_ZOOM}
                 onDragEnd={handleDrag}
-                position={position}
+                markerPosition={markerPosition}
               />
-              <div className="App__mapstylepicker">
-                <MapStylePicker value={this.state.mapStyleKey} onChange={handleMapStyleChange} />
-              </div>
-              {notFound && <div className="App__notfound">Could not find city</div>}
+              {!data && <div className="App__notfound">No Weather Data Available</div>}
               {weather && (
                 <div className="App__media-overlay">
                   <div className="App__media-report">
                     <Report
                       id={weather.id}
-                      location={data.name}
+                      location={location}
                       icon={weather.icon}
                       timestamp={data.dt}
                       temp={data.main.temp}
-                      country={(data.sys && data.sys.country) || ''}
                     />
                   </div>
                 </div>

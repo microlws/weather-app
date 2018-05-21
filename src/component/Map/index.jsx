@@ -19,7 +19,7 @@ class Map extends React.Component {
 
   render() {
     const { handleLoaded } = this
-    const { defaultPosition, position, onDragEnd, mapStyle, maxZoom, minZoom, defaultZoom } = this.props
+    const { defaultPosition, markerPosition, onDragEnd, mapStyle, maxZoom, minZoom, defaultZoom } = this.props
 
     return (
       <GoogleMap
@@ -37,7 +37,7 @@ class Map extends React.Component {
           disableDefaultUI: true,
         }}
       >
-        {position && <PositionMarker position={position} />}
+        {markerPosition && <PositionMarker position={markerPosition} />}
       </GoogleMap>
     )
   }
@@ -48,7 +48,7 @@ Map.propTypes = {
     lat: PropTypes.number.isRequired,
     lng: PropTypes.number.isRequired,
   }).isRequired,
-  position: PropTypes.oneOfType([
+  markerPosition: PropTypes.oneOfType([
     PropTypes.shape({
       lat: PropTypes.number.isRequired,
       lng: PropTypes.number.isRequired,

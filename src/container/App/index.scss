@@ -1,6 +1,12 @@
 .App {
   margin: 32px;
   width: 70%;
+  &__map {
+    background-color: #000000;
+  }
+  &__map-container--day {
+    opacity: 0.95;
+  }
   &__media-overlay {
     left: 0;
     position: absolute;
@@ -38,7 +44,7 @@
       padding-top: 56.25%;
       position: relative;
     }
-    &__media-inner {
+    &__map {
       bottom: 0;
       left: 0;
       position: absolute;
@@ -50,9 +56,14 @@
     &__media {
       height: 400px;
     }
-    &__media-inner {
+    &__map {
       height: 100%;
       position: relative;
+    }
+  }
+  @media screen and (min-width: 1140px) {
+    &__media {
+      height: 500px;
     }
   }
 }

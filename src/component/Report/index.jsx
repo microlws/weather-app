@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { getCountryNameFromCode } from 'tools/countries'
 import './index.scss'
 
 // https://openweathermap.org/weather-conditions
@@ -116,13 +115,10 @@ class Report extends React.Component {
   render() {
     return (
       <div className="Report">
-        <img className="Report__icon" src={`assets/image/weather/${this.state.icon}.png`} alt="" />
         <div className="Report__info">
+          <div className="Report__location">{this.props.location}</div>
           <div className="Report__temperature">{`${Math.floor(this.props.temp)}°`}</div>
-          <div className="Report__locale">
-            <div className="Report__location">{this.props.location}</div>
-            <div className="Report__country">{getCountryNameFromCode(this.props.country)}</div>
-          </div>
+          <img className="Report__icon" src={`assets/image/weather/${this.state.icon}.png`} alt="" />
         </div>
       </div>
     )
@@ -132,7 +128,6 @@ class Report extends React.Component {
 Report.propTypes = {
   temp: PropTypes.number.isRequired,
   location: PropTypes.string.isRequired,
-  country: PropTypes.string.isRequired,
 }
 
 export default Report

@@ -1,9 +1,7 @@
 .Report {
   &__icon {
-    height: auto;
-    left: 93px;
-    position: absolute;
-    top: 0;
+    height: 71px;
+    margin-left: -2px;
     width: 74px;
   }
   &__info {
@@ -14,25 +12,24 @@
     top: 11px;
   }
   &__temperature {
-    font-size: 45px;
+    display: inline-block;
+    font-size: 49px;
     font-weight: 900;
+    position: relative;
+    top: -29px;
   }
   &__location {
     font-size: 25px;
     font-weight: 900;
   }
-  &__country {
-    font-size: 20px;
-    font-weight: 700;
-  }
   @media screen and (max-width: 800px) {
     &__icon {
-      left: 73px;
-      top: 3px;
-      width: 64px;
+      height: 48px;
+      width: 50px;
     }
     &__temperature {
-      font-size: 38px;
+      font-size: 35px;
+      top: -17px;
     }
     &__location {
       font-size: 21px;
@@ -42,9 +39,11 @@
     }
   }
   @media screen and (max-width: 460px) {
+    &__info {
+      left: 8px;
+      top: 2px;
+    }
     &__icon {
-      left: 56px;
-      top: 6px;
       width: 50px;
     }
     &__temperature {
